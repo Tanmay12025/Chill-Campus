@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { 
   Clipboard, 
   Upload, 
@@ -9,7 +8,8 @@ import {
   FileText, 
   User, 
   BookOpen,
-  GraduationCap
+  GraduationCap,
+  Clock  // Add this import
 } from "lucide-react";
 
 const Admission = () => {
