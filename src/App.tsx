@@ -10,6 +10,14 @@ import Community from "./pages/Community";
 import Complaint from "./pages/Complaint";
 import Admission from "./pages/Admission";
 import NotFound from "./pages/NotFound";
+import Calendar from "./pages/Calendar";
+import Events from "./pages/Events";
+import Notices from "./pages/Notices";
+import Settings from "./pages/Settings";
+import Curriculum from "./pages/Curriculum";
+import Examination from "./pages/Examination";
+import Finance from "./pages/Finance";
+import Faculty from "./pages/Faculty";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +32,17 @@ const App = () => (
           <Route path="/community" element={<Layout><Community /></Layout>} />
           <Route path="/complaint" element={<Layout><Complaint /></Layout>} />
           <Route path="/admission" element={<Layout><Admission /></Layout>} />
+          
+          {/* Sidebar routes */}
+          <Route path="/calendar" element={<Layout><Calendar /></Layout>} />
+          <Route path="/events" element={<Layout><Events /></Layout>} />
+          <Route path="/notices" element={<Layout><Notices /></Layout>} />
+          <Route path="/settings" element={<Layout><Settings /></Layout>} />
+          <Route path="/curriculum" element={<Layout><Curriculum /></Layout>} />
+          <Route path="/examination" element={<Layout><Examination /></Layout>} />
+          <Route path="/finance" element={<Layout><Finance /></Layout>} />
+          <Route path="/faculty" element={<Layout><Faculty /></Layout>} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<Layout><NotFound /></Layout>} />
         </Routes>
