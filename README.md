@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/2fea1861-41b1-4301-bd17-917c65193557
+**URL**: https://preview--vit-portal-dashboard-chat.lovable.app/
 
 ## How can I edit this code?
 
