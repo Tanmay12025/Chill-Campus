@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   User, 
@@ -99,19 +98,19 @@ const Settings = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Student ID</label>
-                        <input type="text" className="w-full p-2 border rounded-md" defaultValue="S12345678" readOnly className="bg-muted" />
+                        <input type="text" className="w-full p-2 border rounded-md bg-muted" defaultValue="S12345678" readOnly />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Program</label>
-                        <input type="text" className="w-full p-2 border rounded-md" defaultValue="Computer Science" readOnly className="bg-muted" />
+                        <input type="text" className="w-full p-2 border rounded-md bg-muted" defaultValue="Computer Science" readOnly />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Batch</label>
-                        <input type="text" className="w-full p-2 border rounded-md" defaultValue="2022-2026" readOnly className="bg-muted" />
+                        <input type="text" className="w-full p-2 border rounded-md bg-muted" defaultValue="2022-2026" readOnly />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Current Semester</label>
-                        <input type="text" className="w-full p-2 border rounded-md" defaultValue="4" readOnly className="bg-muted" />
+                        <input type="text" className="w-full p-2 border rounded-md bg-muted" defaultValue="4" readOnly />
                       </div>
                     </div>
                   </div>

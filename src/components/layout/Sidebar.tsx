@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { 
   Calendar, 
   Bell, 
@@ -13,7 +13,7 @@ import {
   Library,
   UserPlus,
   Home,
-  Utensils,
+  UtensilsCrossed,
   Building,
   HandHelping,
   CreditCard,
@@ -21,7 +21,11 @@ import {
   Wifi,
   Laptop,
   Heart,
-  Globe
+  Globe,
+  Clock,
+  BrainCircuit,
+  TimerReset,
+  SmilePlus
 } from "lucide-react";
 
 interface SidebarProps {
@@ -29,7 +33,8 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen }: SidebarProps) => {
-  const [activeLink, setActiveLink] = useState("dashboard");
+  const location = useLocation();
+  const [activeLink, setActiveLink] = useState(location.pathname.substring(1) || "home");
 
   return (
     <aside 
@@ -53,7 +58,7 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
               isOpen={isOpen} 
               icon={<Calendar />} 
               label="Calendar" 
-              active={activeLink === "calendar"} 
+              active={activeLink === "calendar"}
               onClick={() => setActiveLink("calendar")}
               path="/calendar"
             />
@@ -81,6 +86,41 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
               onClick={() => setActiveLink("settings")}
               path="/settings"
             />
+          </div>
+          
+          {/* New Features */}
+          <div className="pt-4 mt-4 border-t">
+            <h3 className={`text-xs font-medium text-muted-foreground px-2 mb-2 transition-opacity ${
+              isOpen ? "opacity-100" : "opacity-0 md:opacity-100"
+            }`}>
+              Study Tools
+            </h3>
+            <div className="space-y-1">
+              <SidebarLink 
+                isOpen={isOpen} 
+                icon={<BrainCircuit />} 
+                label="Smart Planner" 
+                active={activeLink === "planner"} 
+                onClick={() => setActiveLink("planner")}
+                path="/planner"
+              />
+              <SidebarLink 
+                isOpen={isOpen} 
+                icon={<TimerReset />} 
+                label="Pomodoro Timer" 
+                active={activeLink === "pomodoro"} 
+                onClick={() => setActiveLink("pomodoro")}
+                path="/pomodoro"
+              />
+              <SidebarLink 
+                isOpen={isOpen} 
+                icon={<SmilePlus />} 
+                label="Mood Tracking" 
+                active={activeLink === "mood"} 
+                onClick={() => setActiveLink("mood")}
+                path="/mood"
+              />
+            </div>
           </div>
           
           {/* Academic Resources */}
@@ -136,19 +176,19 @@ const Sidebar = ({ isOpen }: SidebarProps) => {
             <div className="space-y-1">
               <SidebarLink 
                 isOpen={isOpen} 
-                icon={<Utensils />} 
-                label="Dining Services" 
+                icon={<UtensilsCrossed />} 
+                label="Mess & Restaurant" 
                 active={activeLink === "dining"} 
                 onClick={() => setActiveLink("dining")}
                 path="/dining"
               />
               <SidebarLink 
                 isOpen={isOpen} 
-                icon={<Home />} 
-                label="Housing" 
-                active={activeLink === "housing"} 
-                onClick={() => setActiveLink("housing")}
-                path="/housing"
+                icon={<Building />} 
+                label="Hostels" 
+                active={activeLink === "hostels"} 
+                onClick={() => setActiveLink("hostels")}
+                path="/hostels"
               />
             </div>
           </div>

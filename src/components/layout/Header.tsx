@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User, LogIn, LogOut } from "lucide-react";
+import { Menu, User, LogIn, LogOut, ChevronDown } from "lucide-react";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,15 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -18,9 +26,17 @@ interface HeaderProps {
 const Header = ({ toggleSidebar }: HeaderProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
+  const [userType, setUserType] = useState<"student" | "faculty" | "admin" | "parent">("student");
+  const [loginOpen, setLoginOpen] = useState(false);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  const handleLogin = (type: "student" | "faculty" | "admin" | "parent") => {
+    setIsLoggedIn(true);
+    setUserType(type);
+    setLoginOpen(false);
   };
 
   const tabs = [
@@ -71,20 +87,55 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center space-x-2 px-3 py-1 rounded-full bg-muted hover:bg-muted/80 transition-colors">
                     <User size={18} />
-                    <span className="hidden sm:inline-block">Student Profile</span>
+                    <span className="hidden sm:inline-block capitalize">{userType} Profile</span>
+                    <ChevronDown size={14} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel>John Doe</DropdownMenuLabel>
-                  <DropdownMenuLabel className="text-xs text-muted-foreground">student@chillcampus.edu</DropdownMenuLabel>
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    {userType === "student" ? "student@chillcampus.edu" : 
+                     userType === "faculty" ? "faculty@chillcampus.edu" :
+                     userType === "admin" ? "admin@chillcampus.edu" : "parent@example.com"}
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Academic Records</DropdownMenuItem>
-                  <DropdownMenuItem>Financial Management</DropdownMenuItem>
-                  <DropdownMenuItem>Examination</DropdownMenuItem>
+                  
+                  {userType === "student" && (
+                    <>
+                      <DropdownMenuItem>Academic Records</DropdownMenuItem>
+                      <DropdownMenuItem>Financial Management</DropdownMenuItem>
+                      <DropdownMenuItem>Examination</DropdownMenuItem>
+                    </>
+                  )}
+                  
+                  {userType === "faculty" && (
+                    <>
+                      <DropdownMenuItem>Classes Schedule</DropdownMenuItem>
+                      <DropdownMenuItem>Student Management</DropdownMenuItem>
+                      <DropdownMenuItem>Course Materials</DropdownMenuItem>
+                    </>
+                  )}
+                  
+                  {userType === "admin" && (
+                    <>
+                      <DropdownMenuItem>Campus Management</DropdownMenuItem>
+                      <DropdownMenuItem>User Administration</DropdownMenuItem>
+                      <DropdownMenuItem>System Settings</DropdownMenuItem>
+                    </>
+                  )}
+                  
+                  {userType === "parent" && (
+                    <>
+                      <DropdownMenuItem>Student Progress</DropdownMenuItem>
+                      <DropdownMenuItem>Fee Payment</DropdownMenuItem>
+                      <DropdownMenuItem>Attendance Report</DropdownMenuItem>
+                    </>
+                  )}
+                  
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
                     <LogOut className="mr-2 h-4 w-4" />
@@ -93,13 +144,107 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <button 
-                onClick={() => setIsLoggedIn(true)}
-                className="flex items-center space-x-2 px-3 py-1 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-              >
-                <LogIn size={18} />
-                <span className="hidden sm:inline-block">Sign In</span>
-              </button>
+              <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="default" className="flex items-center space-x-2">
+                    <LogIn size={18} />
+                    <span className="hidden sm:inline-block">Login</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Login to Chill Campus</DialogTitle>
+                    <DialogDescription>
+                      Access your campus resources and information
+                    </DialogDescription>
+                  </DialogHeader>
+                  
+                  <Tabs defaultValue="student" className="w-full mt-4">
+                    <TabsList className="grid w-full grid-cols-4">
+                      <TabsTrigger value="student">Student</TabsTrigger>
+                      <TabsTrigger value="faculty">Faculty</TabsTrigger>
+                      <TabsTrigger value="admin">Admin</TabsTrigger>
+                      <TabsTrigger value="parent">Parent</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="student" className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="student-email">Email</Label>
+                        <Input id="student-email" placeholder="student@chillcampus.edu" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="student-password">Password</Label>
+                        <Input id="student-password" type="password" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <input type="checkbox" id="student-remember" className="rounded" />
+                          <Label htmlFor="student-remember" className="text-sm">Remember me</Label>
+                        </div>
+                        <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                          Forgot password?
+                        </Link>
+                      </div>
+                      <Button className="w-full" onClick={() => handleLogin("student")}>
+                        Login as Student
+                      </Button>
+                      <div className="text-center">
+                        <span className="text-sm text-muted-foreground">Or login with</span>
+                        <div className="flex justify-center space-x-2 mt-2">
+                          <Button variant="outline" className="w-full">Google</Button>
+                          <Button variant="outline" className="w-full">Microsoft</Button>
+                        </div>
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="faculty" className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="faculty-email">Email</Label>
+                        <Input id="faculty-email" placeholder="faculty@chillcampus.edu" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="faculty-password">Password</Label>
+                        <Input id="faculty-password" type="password" />
+                      </div>
+                      <Button className="w-full" onClick={() => handleLogin("faculty")}>
+                        Login as Faculty
+                      </Button>
+                    </TabsContent>
+                    
+                    <TabsContent value="admin" className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="admin-email">Email</Label>
+                        <Input id="admin-email" placeholder="admin@chillcampus.edu" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="admin-password">Password</Label>
+                        <Input id="admin-password" type="password" />
+                      </div>
+                      <Button className="w-full" onClick={() => handleLogin("admin")}>
+                        Login as Admin
+                      </Button>
+                    </TabsContent>
+                    
+                    <TabsContent value="parent" className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="parent-email">Email</Label>
+                        <Input id="parent-email" placeholder="parent@example.com" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="parent-password">Password</Label>
+                        <Input id="parent-password" type="password" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="student-id">Student ID</Label>
+                        <Input id="student-id" placeholder="Student ID" />
+                      </div>
+                      <Button className="w-full" onClick={() => handleLogin("parent")}>
+                        Login as Parent
+                      </Button>
+                    </TabsContent>
+                  </Tabs>
+                </DialogContent>
+              </Dialog>
             )}
           </div>
         </div>

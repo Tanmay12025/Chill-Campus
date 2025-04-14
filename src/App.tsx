@@ -18,6 +18,13 @@ import Curriculum from "./pages/Curriculum";
 import Examination from "./pages/Examination";
 import Finance from "./pages/Finance";
 import Faculty from "./pages/Faculty";
+import Library from "./pages/Library";
+import Tutoring from "./pages/Tutoring";
+import Hostels from "./pages/Hostels";
+import Dining from "./pages/Dining";
+import Planner from "./pages/Planner";
+import Pomodoro from "./pages/Pomodoro";
+import Mood from "./pages/Mood";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +49,27 @@ const App = () => (
           <Route path="/examination" element={<Layout><Examination /></Layout>} />
           <Route path="/finance" element={<Layout><Finance /></Layout>} />
           <Route path="/faculty" element={<Layout><Faculty /></Layout>} />
+          
+          {/* Study Tools */}
+          <Route path="/planner" element={<Layout><Planner /></Layout>} />
+          <Route path="/pomodoro" element={<Layout><Pomodoro /></Layout>} />
+          <Route path="/mood" element={<Layout><Mood /></Layout>} />
+          
+          {/* New routes */}
+          <Route path="/library" element={<Layout><Library /></Layout>} />
+          <Route path="/tutoring" element={<Layout><Tutoring /></Layout>} />
+          <Route path="/hostels" element={<Layout><Hostels /></Layout>} />
+          <Route path="/dining" element={<Layout><Dining /></Layout>} />
+          
+          {/* Additional routes for 404 pages */}
+          <Route path="/clubs" element={<Layout><NotFound /></Layout>} />
+          <Route path="/community-service" element={<Layout><NotFound /></Layout>} />
+          <Route path="/billing" element={<Layout><NotFound /></Layout>} />
+          <Route path="/registrar" element={<Layout><NotFound /></Layout>} />
+          <Route path="/it" element={<Layout><NotFound /></Layout>} />
+          <Route path="/wifi" element={<Layout><NotFound /></Layout>} />
+          <Route path="/counselling" element={<Layout><NotFound /></Layout>} />
+          <Route path="/aid" element={<Layout><NotFound /></Layout>} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<Layout><NotFound /></Layout>} />
