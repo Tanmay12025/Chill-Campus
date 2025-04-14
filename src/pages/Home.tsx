@@ -2,8 +2,23 @@
 import Calendar from "@/components/dashboard/Calendar";
 import NoticeBoard from "@/components/dashboard/NoticeBoard";
 import VITMap from "@/components/VITMap";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
+  const { profile } = useAuth();
+  
+  // Determine college name based on user profile
+  const getCollegeName = () => {
+    if (!profile || !profile.college_id) return "Chill Campus University";
+    
+    // Extract college name from college ID or email if available
+    if (profile.college_id.toLowerCase().includes('vit')) {
+      return "VIT University";
+    }
+    
+    return "Chill Campus University";
+  };
+  
   return (
     <div className="space-y-6 py-4">
       <div className="flex items-center justify-between">
@@ -17,14 +32,14 @@ const Home = () => {
       </div>
 
       <div className="border-t pt-6">
-        <h2 className="text-xl font-bold mb-4">Chill Campus University</h2>
+        <h2 className="text-xl font-bold mb-4">{getCollegeName()}</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="dashboard-card md:col-span-2">
             <h3 className="text-lg font-semibold mb-3">About</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Chill Campus University is one of India's leading institutions known for academic excellence and innovative research. 
-              Established with a vision to provide world-class education, Chill Campus offers a wide range of undergraduate, 
+              {getCollegeName()} is one of India's leading institutions known for academic excellence and innovative research. 
+              Established with a vision to provide world-class education, {getCollegeName()} offers a wide range of undergraduate, 
               postgraduate, and doctoral programs in Engineering, Management, Computer Applications, and Sciences.
             </p>
             <p className="text-sm text-muted-foreground">
