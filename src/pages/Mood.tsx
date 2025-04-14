@@ -1,476 +1,362 @@
 
 import { useState } from "react";
-import { 
-  Calendar, 
-  ChevronLeft, 
-  ChevronRight, 
-  SmilePlus,
-  Frown,
-  Meh,
-  Smile,
-  LucideHeart,
-  LineChart,
-  Check,
-  CalendarDays,
-  AlarmClock,
-  Lightbulb,
-  Timer,
-  Music,
-  BookOpen,
-  Users
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SmilePlus, Clock, BarChart, Book, Coffee, Dumbbell, Brain, Heart } from "lucide-react";
 
-const Mood = () => {
-  const [selectedMood, setSelectedMood] = useState<"stressed" | "okay" | "good" | "great" | null>(null);
-  const [moodNote, setMoodNote] = useState("");
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  
-  // Sample mood data
-  const moodHistory = [
-    { date: "2025-04-01", mood: "okay", note: "Busy day with classes" },
-    { date: "2025-04-02", mood: "good", note: "Completed assignment ahead of time" },
-    { date: "2025-04-03", mood: "great", note: "Aced my presentation!" },
-    { date: "2025-04-05", mood: "stressed", note: "Too many deadlines" },
-    { date: "2025-04-07", mood: "good", note: "Productive study session" },
-    { date: "2025-04-09", mood: "okay", note: "Feeling tired but hanging in there" },
-    { date: "2025-04-10", mood: "stressed", note: "Difficult quiz today" },
-    { date: "2025-04-12", mood: "great", note: "Weekend relaxation" },
-  ];
-  
-  // Sample recommendations based on mood
-  const recommendations = {
-    stressed: [
-      { id: 1, icon: <Timer className="h-4 w-4" />, text: "Take a 15-minute break" },
-      { id: 2, icon: <Music className="h-4 w-4" />, text: "Listen to calming music" },
-      { id: 3, icon: <AlarmClock className="h-4 w-4" />, text: "Practice deep breathing for 5 minutes" },
-      { id: 4, icon: <Users className="h-4 w-4" />, text: "Talk to a friend or counselor" }
-    ],
-    okay: [
-      { id: 1, icon: <BookOpen className="h-4 w-4" />, text: "Do something creative for 30 minutes" },
-      { id: 2, icon: <Timer className="h-4 w-4" />, text: "Take regular study breaks" },
-      { id: 3, icon: <Lightbulb className="h-4 w-4" />, text: "Try a new study technique" }
-    ],
-    good: [
-      { id: 1, icon: <Check className="h-4 w-4" />, text: "Set goals for tomorrow" },
-      { id: 2, icon: <BookOpen className="h-4 w-4" />, text: "Work on challenging tasks" },
-      { id: 3, icon: <Users className="h-4 w-4" />, text: "Help a classmate who's struggling" }
-    ],
-    great: [
-      { id: 1, icon: <Check className="h-4 w-4" />, text: "Keep up the momentum" },
-      { id: 2, icon: <Lightbulb className="h-4 w-4" />, text: "Tackle your most difficult tasks" },
-      { id: 3, icon: <Users className="h-4 w-4" />, text: "Share your energy with others" }
-    ]
+const MoodTracker = () => {
+  const [selectedMood, setSelectedMood] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState("today");
+
+  const handleMoodSelection = (mood: string) => {
+    setSelectedMood(mood);
   };
-  
-  // Calculate mood statistics
-  const moodStats = {
-    great: moodHistory.filter(m => m.mood === "great").length,
-    good: moodHistory.filter(m => m.mood === "good").length,
-    okay: moodHistory.filter(m => m.mood === "okay").length,
-    stressed: moodHistory.filter(m => m.mood === "stressed").length,
-    total: moodHistory.length
-  };
-  
-  const submitMoodEntry = () => {
-    if (!selectedMood) return;
-    
-    // Here you would normally save the mood to a database
-    alert(`Mood tracked: ${selectedMood} - ${moodNote}`);
-    
-    // Reset form
-    setSelectedMood(null);
-    setMoodNote("");
-  };
-  
-  const getMoodIcon = (mood: string) => {
-    switch(mood) {
-      case "stressed": return <Frown className="h-6 w-6 text-red-500" />;
-      case "okay": return <Meh className="h-6 w-6 text-yellow-500" />;
-      case "good": return <Smile className="h-6 w-6 text-green-500" />;
-      case "great": return <LucideHeart className="h-6 w-6 text-purple-500" />;
-      default: return null;
-    }
-  };
-  
-  const getMoodColor = (mood: string) => {
-    switch(mood) {
-      case "stressed": return "bg-red-100 text-red-800";
-      case "okay": return "bg-yellow-100 text-yellow-800";
-      case "good": return "bg-green-100 text-green-800";
-      case "great": return "bg-purple-100 text-purple-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
-  };
-  
+
   return (
     <div className="space-y-6 py-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold mb-1">Mood Tracking</h1>
-          <p className="text-muted-foreground">
-            Monitor your wellbeing and get personalized recommendations
-          </p>
-        </div>
+        <h1 className="text-2xl font-bold">Mood Tracking</h1>
+        <span className="vit-badge">Mental Wellbeing</span>
       </div>
 
-      <Tabs defaultValue="track" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="track">Track Today</TabsTrigger>
-          <TabsTrigger value="history">Mood History</TabsTrigger>
+      <Tabs defaultValue="today" onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-4 mb-8">
+          <TabsTrigger value="today">Today</TabsTrigger>
+          <TabsTrigger value="week">This Week</TabsTrigger>
+          <TabsTrigger value="month">This Month</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="track" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <SmilePlus className="mr-2 h-5 w-5" />
-                  How are you feeling today?
-                </CardTitle>
-                <CardDescription>
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-4 gap-4">
-                  <button 
-                    className={`aspect-square flex flex-col items-center justify-center p-4 rounded-xl transition-all ${
-                      selectedMood === "stressed" 
-                        ? "bg-red-100 ring-2 ring-red-500" 
-                        : "bg-muted hover:bg-red-50"
-                    }`}
-                    onClick={() => setSelectedMood("stressed")}
-                  >
-                    <Frown className={`h-12 w-12 mb-2 ${
-                      selectedMood === "stressed" ? "text-red-500" : "text-muted-foreground"
-                    }`} />
-                    <span className={selectedMood === "stressed" ? "text-red-700" : ""}>
-                      Stressed
-                    </span>
-                  </button>
-                  
-                  <button 
-                    className={`aspect-square flex flex-col items-center justify-center p-4 rounded-xl transition-all ${
-                      selectedMood === "okay" 
-                        ? "bg-yellow-100 ring-2 ring-yellow-500" 
-                        : "bg-muted hover:bg-yellow-50"
-                    }`}
-                    onClick={() => setSelectedMood("okay")}
-                  >
-                    <Meh className={`h-12 w-12 mb-2 ${
-                      selectedMood === "okay" ? "text-yellow-500" : "text-muted-foreground"
-                    }`} />
-                    <span className={selectedMood === "okay" ? "text-yellow-700" : ""}>
-                      Okay
-                    </span>
-                  </button>
-                  
-                  <button 
-                    className={`aspect-square flex flex-col items-center justify-center p-4 rounded-xl transition-all ${
-                      selectedMood === "good" 
-                        ? "bg-green-100 ring-2 ring-green-500" 
-                        : "bg-muted hover:bg-green-50"
-                    }`}
-                    onClick={() => setSelectedMood("good")}
-                  >
-                    <Smile className={`h-12 w-12 mb-2 ${
-                      selectedMood === "good" ? "text-green-500" : "text-muted-foreground"
-                    }`} />
-                    <span className={selectedMood === "good" ? "text-green-700" : ""}>
-                      Good
-                    </span>
-                  </button>
-                  
-                  <button 
-                    className={`aspect-square flex flex-col items-center justify-center p-4 rounded-xl transition-all ${
-                      selectedMood === "great" 
-                        ? "bg-purple-100 ring-2 ring-purple-500" 
-                        : "bg-muted hover:bg-purple-50"
-                    }`}
-                    onClick={() => setSelectedMood("great")}
-                  >
-                    <LucideHeart className={`h-12 w-12 mb-2 ${
-                      selectedMood === "great" ? "text-purple-500" : "text-muted-foreground"
-                    }`} />
-                    <span className={selectedMood === "great" ? "text-purple-700" : ""}>
-                      Great
-                    </span>
-                  </button>
-                </div>
+        <TabsContent value="today" className="space-y-6">
+          <div className="dashboard-card">
+            <h2 className="text-xl font-semibold mb-6">How are you feeling today?</h2>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <MoodOption 
+                name="Stressed"
+                emoji="😫"
+                description="Feeling overwhelmed"
+                color="bg-red-100 hover:bg-red-200"
+                textColor="text-red-800"
+                isSelected={selectedMood === "Stressed"}
+                onClick={() => handleMoodSelection("Stressed")}
+              />
+              
+              <MoodOption 
+                name="Okay"
+                emoji="😐"
+                description="Just getting by"
+                color="bg-yellow-100 hover:bg-yellow-200"
+                textColor="text-yellow-800"
+                isSelected={selectedMood === "Okay"}
+                onClick={() => handleMoodSelection("Okay")}
+              />
+              
+              <MoodOption 
+                name="Good"
+                emoji="🙂"
+                description="Feeling positive"
+                color="bg-blue-100 hover:bg-blue-200"
+                textColor="text-blue-800"
+                isSelected={selectedMood === "Good"}
+                onClick={() => handleMoodSelection("Good")}
+              />
+              
+              <MoodOption 
+                name="Great"
+                emoji="😄"
+                description="Energized & motivated"
+                color="bg-green-100 hover:bg-green-200"
+                textColor="text-green-800"
+                isSelected={selectedMood === "Great"}
+                onClick={() => handleMoodSelection("Great")}
+              />
+            </div>
+            
+            {selectedMood && (
+              <div className="mt-6 p-4 rounded-lg bg-muted">
+                <h3 className="font-medium mb-2">You selected: {selectedMood}</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {selectedMood === "Stressed" && "Take some deep breaths and consider a short break from your work. Remember to practice self-care today."}
+                  {selectedMood === "Okay" && "You're doing alright. Consider taking a short walk or listening to some music to lift your spirits."}
+                  {selectedMood === "Good" && "That's great! Maintain this positive energy by staying hydrated and taking regular breaks."}
+                  {selectedMood === "Great" && "Excellent! This is the perfect time to tackle challenging tasks or help others who might be struggling."}
+                </p>
                 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Add notes (optional)</label>
-                  <Textarea 
-                    placeholder="What's contributing to your mood today?" 
-                    value={moodNote}
-                    onChange={(e) => setMoodNote(e.target.value)}
-                    rows={3}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <RecommendationCard 
+                    title={selectedMood === "Stressed" ? "Breathing Exercise" : selectedMood === "Okay" ? "Nature Walk" : "Productive Focus"}
+                    description={selectedMood === "Stressed" ? "Try 4-7-8 breathing technique for 5 minutes" : selectedMood === "Okay" ? "Take a 15-minute walk outside" : "Use this energy for tackling challenging tasks"}
+                    icon={selectedMood === "Stressed" ? Brain : selectedMood === "Okay" ? Heart : Book}
+                  />
+                  
+                  <RecommendationCard 
+                    title={selectedMood === "Stressed" ? "Physical Activity" : selectedMood === "Okay" ? "Music Break" : "Help Others"}
+                    description={selectedMood === "Stressed" ? "Do some light stretching to release tension" : selectedMood === "Okay" ? "Listen to uplifting music for 10 minutes" : "Share your positive energy by helping classmates"}
+                    icon={selectedMood === "Stressed" ? Dumbbell : selectedMood === "Okay" ? Heart : Heart}
+                  />
+                  
+                  <RecommendationCard 
+                    title={selectedMood === "Stressed" ? "Break Time" : selectedMood === "Okay" ? "Gratitude Journal" : "Self-Care"}
+                    description={selectedMood === "Stressed" ? "Take a 15-minute break from your screens" : selectedMood === "Okay" ? "Write down three things you're grateful for" : "Don't forget to maintain your wellbeing rituals"}
+                    icon={selectedMood === "Stressed" ? Coffee : selectedMood === "Okay" ? Book : Coffee}
                   />
                 </div>
-              </CardContent>
-              <CardFooter>
-                <Button 
-                  className="w-full" 
-                  onClick={submitMoodEntry} 
-                  disabled={!selectedMood}
-                >
-                  Save Mood Entry
-                </Button>
-              </CardFooter>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Personalized Recommendations</CardTitle>
-                <CardDescription>
-                  Based on your current mood
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!selectedMood ? (
-                  <div className="h-52 flex flex-col items-center justify-center text-center text-muted-foreground">
-                    <SmilePlus className="h-12 w-12 mb-3 opacity-50" />
-                    <p>Select your mood to see personalized recommendations</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className={`p-4 rounded-lg ${
-                      selectedMood === "stressed" ? "bg-red-50" :
-                      selectedMood === "okay" ? "bg-yellow-50" :
-                      selectedMood === "good" ? "bg-green-50" :
-                      "bg-purple-50"
-                    }`}>
-                      <div className="flex items-center mb-3">
-                        {getMoodIcon(selectedMood)}
-                        <span className="ml-2 font-medium capitalize">{selectedMood}</span>
-                      </div>
-                      <p className="text-sm">
-                        {selectedMood === "stressed" ? 
-                          "It's important to take care of yourself when feeling stressed. Here are some suggestions that might help:" :
-                        selectedMood === "okay" ? 
-                          "You're doing okay today. Here are some ways to boost your mood:" :
-                        selectedMood === "good" ? 
-                          "You're having a good day! Here's how to maintain your positive momentum:" : 
-                          "You're feeling great today! Here's how to share your positive energy:"}
-                      </p>
-                    </div>
-                    
-                    <ul className="space-y-2">
-                      {recommendations[selectedMood].map(rec => (
-                        <li key={rec.id} className="flex items-start p-2 rounded-md hover:bg-muted">
-                          <div className="bg-primary/10 p-1.5 rounded-full mr-3">
-                            {rec.icon}
-                          </div>
-                          <span className="text-sm pt-0.5">{rec.text}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <Separator />
-                    
-                    <div className="bg-muted p-3 rounded-md">
-                      <h4 className="text-sm font-medium mb-1">Need more support?</h4>
-                      <p className="text-xs text-muted-foreground mb-2">
-                        Remember that the university counseling center is available for all students.
-                      </p>
-                      <Button variant="outline" size="sm" className="w-full">
-                        Schedule Appointment
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              </div>
+            )}
+          </div>
+          
+          <div className="dashboard-card">
+            <h2 className="text-lg font-semibold mb-4">Track your wellbeing factors</h2>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Sleep Quality</span>
+                  <span>7/10</span>
+                </div>
+                <Progress value={70} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Stress Level</span>
+                  <span>4/10</span>
+                </div>
+                <Progress value={40} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Energy Level</span>
+                  <span>6/10</span>
+                </div>
+                <Progress value={60} className="h-2" />
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Focus Quality</span>
+                  <span>8/10</span>
+                </div>
+                <Progress value={80} className="h-2" />
+              </div>
+            </div>
           </div>
         </TabsContent>
         
-        <TabsContent value="history" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center">
-                    <CalendarDays className="mr-2 h-5 w-5" />
-                    Mood Calendar
-                  </CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <span>
-                      {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                    </span>
-                    <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-7 gap-1">
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="text-center font-medium text-xs py-2">
-                      {day}
-                    </div>
-                  ))}
-                  
-                  {Array.from({ length: 35 }).map((_, i) => {
-                    const day = i + 1;
-                    const dateStr = `2025-04-${day.toString().padStart(2, '0')}`;
-                    const moodEntry = moodHistory.find(m => m.date === dateStr);
-                    
-                    return (
-                      <div 
-                        key={i} 
-                        className={`aspect-square rounded-md flex flex-col items-center justify-center text-sm relative
-                          ${moodEntry ? `${getMoodColor(moodEntry.mood)} hover:ring-2` : 'bg-muted hover:bg-muted/80'}`}
-                      >
-                        <span>{day}</span>
-                        {moodEntry && (
-                          <div className="absolute bottom-1 right-1">
-                            {getMoodIcon(moodEntry.mood)}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Entries</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 max-h-96 overflow-y-auto">
-                {moodHistory
-                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                  .map((entry, index) => (
-                    <div key={index} className="border-b pb-3 last:border-0 last:pb-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm font-medium">
-                          {new Date(entry.date).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
-                        </span>
-                        <Badge variant="outline" className={getMoodColor(entry.mood)}>
-                          <span className="capitalize">{entry.mood}</span>
-                        </Badge>
-                      </div>
-                      {entry.note && (
-                        <p className="text-sm text-muted-foreground">
-                          {entry.note}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-              </CardContent>
-            </Card>
+        <TabsContent value="week">
+          <div className="dashboard-card">
+            <h2 className="text-xl font-semibold mb-6">Your mood this week</h2>
+            <div className="h-64 flex items-end justify-between gap-2 mb-4">
+              <div className="flex flex-col items-center gap-2 w-full">
+                <div className="bg-blue-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-green-500 rounded-t w-full" style={{ height: '40%' }}></div>
+                <div className="bg-yellow-500 rounded-t w-full" style={{ height: '20%' }}></div>
+                <div className="bg-red-500 rounded-t w-full" style={{ height: '10%' }}></div>
+                <span className="text-xs">Mon</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 w-full">
+                <div className="bg-blue-500 rounded-t w-full" style={{ height: '20%' }}></div>
+                <div className="bg-green-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-yellow-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-red-500 rounded-t w-full" style={{ height: '20%' }}></div>
+                <span className="text-xs">Tue</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 w-full">
+                <div className="bg-blue-500 rounded-t w-full" style={{ height: '10%' }}></div>
+                <div className="bg-green-500 rounded-t w-full" style={{ height: '20%' }}></div>
+                <div className="bg-yellow-500 rounded-t w-full" style={{ height: '40%' }}></div>
+                <div className="bg-red-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <span className="text-xs">Wed</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 w-full">
+                <div className="bg-blue-500 rounded-t w-full" style={{ height: '40%' }}></div>
+                <div className="bg-green-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-yellow-500 rounded-t w-full" style={{ height: '20%' }}></div>
+                <div className="bg-red-500 rounded-t w-full" style={{ height: '10%' }}></div>
+                <span className="text-xs">Thu</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 w-full">
+                <div className="bg-blue-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-green-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-yellow-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-red-500 rounded-t w-full" style={{ height: '10%' }}></div>
+                <span className="text-xs">Fri</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 w-full">
+                <div className="bg-blue-500 rounded-t w-full" style={{ height: '10%' }}></div>
+                <div className="bg-green-500 rounded-t w-full" style={{ height: '20%' }}></div>
+                <div className="bg-yellow-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-red-500 rounded-t w-full" style={{ height: '40%' }}></div>
+                <span className="text-xs">Sat</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 w-full">
+                <div className="bg-blue-500 rounded-t w-full" style={{ height: '30%' }}></div>
+                <div className="bg-green-500 rounded-t w-full" style={{ height: '40%' }}></div>
+                <div className="bg-yellow-500 rounded-t w-full" style={{ height: '20%' }}></div>
+                <div className="bg-red-500 rounded-t w-full" style={{ height: '10%' }}></div>
+                <span className="text-xs">Sun</span>
+              </div>
+            </div>
+            <div className="flex justify-center gap-4 text-xs">
+              <div className="flex items-center gap-1">
+                <span className="block w-3 h-3 rounded-full bg-blue-500"></span>
+                <span>Great</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="block w-3 h-3 rounded-full bg-green-500"></span>
+                <span>Good</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="block w-3 h-3 rounded-full bg-yellow-500"></span>
+                <span>Okay</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="block w-3 h-3 rounded-full bg-red-500"></span>
+                <span>Stressed</span>
+              </div>
+            </div>
           </div>
         </TabsContent>
         
-        <TabsContent value="insights" className="mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <Card className="md:col-span-8">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <LineChart className="mr-2 h-5 w-5" />
-                  Mood Trends
-                </CardTitle>
-                <CardDescription>
-                  See how your mood has changed over time
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-80 flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <LineChart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Interactive mood charts will be displayed here</p>
-                  <p className="text-sm">Tracking your emotional wellbeing over time</p>
+        <TabsContent value="month">
+          <div className="dashboard-card">
+            <h2 className="text-xl font-semibold mb-6">Monthly Mood Trends</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-medium mb-3">Mood Distribution</h3>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-24 text-sm">Great (25%)</div>
+                  <div className="flex-1 bg-muted rounded-full h-4 overflow-hidden">
+                    <div className="bg-blue-500 h-full" style={{ width: '25%' }}></div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-24 text-sm">Good (40%)</div>
+                  <div className="flex-1 bg-muted rounded-full h-4 overflow-hidden">
+                    <div className="bg-green-500 h-full" style={{ width: '40%' }}></div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-24 text-sm">Okay (20%)</div>
+                  <div className="flex-1 bg-muted rounded-full h-4 overflow-hidden">
+                    <div className="bg-yellow-500 h-full" style={{ width: '20%' }}></div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-24 text-sm">Stressed (15%)</div>
+                  <div className="flex-1 bg-muted rounded-full h-4 overflow-hidden">
+                    <div className="bg-red-500 h-full" style={{ width: '15%' }}></div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium mb-3">Contributing Factors</h3>
+                <div className="space-y-3">
+                  <div className="p-3 border rounded-lg flex justify-between">
+                    <div className="flex items-center gap-2">
+                      <Book className="h-4 w-4 text-primary" />
+                      <span className="text-sm">Academic Pressure</span>
+                    </div>
+                    <span className="text-xs px-2 py-0.5 bg-red-100 text-red-800 rounded-full">High Impact</span>
+                  </div>
+                  <div className="p-3 border rounded-lg flex justify-between">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-primary" />
+                      <span className="text-sm">Sleep Quality</span>
+                    </div>
+                    <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full">Medium Impact</span>
+                  </div>
+                  <div className="p-3 border rounded-lg flex justify-between">
+                    <div className="flex items-center gap-2">
+                      <Heart className="h-4 w-4 text-primary" />
+                      <span className="text-sm">Social Interactions</span>
+                    </div>
+                    <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">Positive Impact</span>
+                  </div>
+                  <div className="p-3 border rounded-lg flex justify-between">
+                    <div className="flex items-center gap-2">
+                      <Dumbbell className="h-4 w-4 text-primary" />
+                      <span className="text-sm">Physical Activity</span>
+                    </div>
+                    <span className="text-xs px-2 py-0.5 bg-green-100 text-green-800 rounded-full">Positive Impact</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="insights">
+          <div className="dashboard-card">
+            <h2 className="text-xl font-semibold mb-6">Your Wellbeing Insights</h2>
             
-            <Card className="md:col-span-4">
-              <CardHeader>
-                <CardTitle>Mood Distribution</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm flex items-center">
-                        <LucideHeart className="h-4 w-4 text-purple-500 mr-1" /> Great
-                      </span>
-                      <span className="text-sm font-medium">
-                        {moodStats.great} days ({Math.round((moodStats.great / moodStats.total) * 100)}%)
-                      </span>
-                    </div>
-                    <Progress value={(moodStats.great / moodStats.total) * 100} className="h-2 bg-muted" indicatorClassName="bg-purple-500" />
+            <div className="space-y-6">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    <BarChart className="h-5 w-5 text-blue-700" />
                   </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm flex items-center">
-                        <Smile className="h-4 w-4 text-green-500 mr-1" /> Good
-                      </span>
-                      <span className="text-sm font-medium">
-                        {moodStats.good} days ({Math.round((moodStats.good / moodStats.total) * 100)}%)
-                      </span>
-                    </div>
-                    <Progress value={(moodStats.good / moodStats.total) * 100} className="h-2 bg-muted" indicatorClassName="bg-green-500" />
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm flex items-center">
-                        <Meh className="h-4 w-4 text-yellow-500 mr-1" /> Okay
-                      </span>
-                      <span className="text-sm font-medium">
-                        {moodStats.okay} days ({Math.round((moodStats.okay / moodStats.total) * 100)}%)
-                      </span>
-                    </div>
-                    <Progress value={(moodStats.okay / moodStats.total) * 100} className="h-2 bg-muted" indicatorClassName="bg-yellow-500" />
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span className="text-sm flex items-center">
-                        <Frown className="h-4 w-4 text-red-500 mr-1" /> Stressed
-                      </span>
-                      <span className="text-sm font-medium">
-                        {moodStats.stressed} days ({Math.round((moodStats.stressed / moodStats.total) * 100)}%)
-                      </span>
-                    </div>
-                    <Progress value={(moodStats.stressed / moodStats.total) * 100} className="h-2 bg-muted" indicatorClassName="bg-red-500" />
-                  </div>
-                  
-                  <Separator className="my-2" />
-                  
-                  <div className="bg-muted p-3 rounded-md">
-                    <h4 className="text-sm font-medium mb-1">Mood Insights</h4>
-                    <p className="text-xs text-muted-foreground">
-                      You've been feeling good or great for {moodStats.good + moodStats.great} days 
-                      ({Math.round(((moodStats.good + moodStats.great) / moodStats.total) * 100)}%) 
-                      of the time this month. Focus on self-care during stressed days.
-                    </p>
-                  </div>
+                  <h3 className="text-lg font-medium text-blue-800">Mood Patterns</h3>
                 </div>
-              </CardContent>
-            </Card>
+                <p className="text-sm text-blue-800">
+                  Your mood tends to be best in the mornings and decreases throughout the day. 
+                  Consider scheduling important tasks earlier in the day when your mental energy is highest.
+                </p>
+              </div>
+              
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <SmilePlus className="h-5 w-5 text-green-700" />
+                  </div>
+                  <h3 className="text-lg font-medium text-green-800">Wellbeing Boosters</h3>
+                </div>
+                <p className="text-sm text-green-800">
+                  Days with outdoor activities and exercise show significantly higher mood ratings.
+                  Try to incorporate at least 30 minutes of physical activity daily.
+                </p>
+              </div>
+              
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                    <Brain className="h-5 w-5 text-amber-700" />
+                  </div>
+                  <h3 className="text-lg font-medium text-amber-800">Stress Triggers</h3>
+                </div>
+                <p className="text-sm text-amber-800">
+                  Examination periods correlate with increased stress levels. 
+                  Plan your study schedule well in advance to avoid last-minute cramming.
+                </p>
+              </div>
+            </div>
+            
+            <div className="mt-6 border-t pt-4">
+              <h3 className="font-medium mb-3">Personalized Recommendations</h3>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm">
+                  <div className="h-2 w-2 rounded-full bg-primary"></div>
+                  <span>Schedule a 20-minute morning meditation to start your day positively</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm">
+                  <div className="h-2 w-2 rounded-full bg-primary"></div>
+                  <span>Take short 5-minute breaks between study sessions</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm">
+                  <div className="h-2 w-2 rounded-full bg-primary"></div>
+                  <span>Limit screen time in the evening to improve sleep quality</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm">
+                  <div className="h-2 w-2 rounded-full bg-primary"></div>
+                  <span>Join a campus club to enhance social connections</span>
+                </li>
+                <li className="flex items-center gap-2 text-sm">
+                  <div className="h-2 w-2 rounded-full bg-primary"></div>
+                  <span>Consider scheduling a session with campus counseling services</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </TabsContent>
       </Tabs>
@@ -478,4 +364,41 @@ const Mood = () => {
   );
 };
 
-export default Mood;
+const MoodOption = ({ name, emoji, description, color, textColor, isSelected, onClick }: { 
+  name: string;
+  emoji: string;
+  description: string;
+  color: string;
+  textColor: string;
+  isSelected: boolean;
+  onClick: () => void;
+}) => {
+  return (
+    <button 
+      className={`p-4 rounded-lg ${color} ${textColor} transition-all ${isSelected ? 'ring-2 ring-primary shadow-lg' : ''}`}
+      onClick={onClick}
+    >
+      <div className="text-4xl mb-2">{emoji}</div>
+      <div className="font-medium">{name}</div>
+      <div className="text-xs mt-1">{description}</div>
+    </button>
+  );
+};
+
+const RecommendationCard = ({ title, description, icon: Icon }: {
+  title: string;
+  description: string;
+  icon: any;
+}) => {
+  return (
+    <div className="p-3 bg-card rounded-lg border shadow-sm">
+      <div className="flex items-center gap-2 mb-2">
+        <Icon className="h-4 w-4 text-primary" />
+        <span className="font-medium text-sm">{title}</span>
+      </div>
+      <p className="text-xs text-muted-foreground">{description}</p>
+    </div>
+  );
+};
+
+export default MoodTracker;

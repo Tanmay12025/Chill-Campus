@@ -1,6 +1,5 @@
 
 import Calendar from "@/components/dashboard/Calendar";
-import Events from "@/components/dashboard/Events";
 import NoticeBoard from "@/components/dashboard/NoticeBoard";
 import VITMap from "@/components/VITMap";
 
@@ -12,9 +11,8 @@ const Home = () => {
         <span className="vit-badge">Academic Year 2024-25</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Calendar />
-        <Events />
         <NoticeBoard />
       </div>
 
@@ -80,7 +78,7 @@ const Home = () => {
               <li>
                 <a href="#" className="text-sm flex items-center text-primary hover:underline">
                   <span className="h-1.5 w-1.5 rounded-full bg-primary mr-2"></span>
-                  Hostel Accommodations
+                  Tutoring Services
                 </a>
               </li>
               <li>

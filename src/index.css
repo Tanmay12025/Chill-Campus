@@ -14,16 +14,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 90% 30%;
 
-    --primary: 210 60% 46%;
+    --primary: 209 56% 46%; /* #3674B5 */
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 199 77% 80%;
+    --secondary: 208 48% 57%; /* #578FCA */
     --secondary-foreground: 210 60% 46%;
 
     --muted: 200 73% 95%;
     --muted-foreground: 210 50% 40%;
 
-    --accent: 180 70% 90%;
+    --accent: 194 83% 80%; /* #A1E3F9 */
     --accent-foreground: 210 60% 46%;
 
     --destructive: 0 84.2% 60.2%;
@@ -136,5 +136,9 @@
 
   .menu-link-active {
     @apply bg-primary text-primary-foreground;
+  }
+  
+  .card-gradient {
+    @apply bg-gradient-to-br from-card to-secondary/80 backdrop-blur-sm;
   }
 }

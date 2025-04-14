@@ -9,12 +9,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuGroup,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -43,7 +40,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
     { id: "home", label: "Home", path: "/" },
     { id: "community", label: "Community", path: "/community" },
     { id: "complaint", label: "Complaint", path: "/complaint" },
-    { id: "admission", label: "Admission Form", path: "/admission" },
+    // Removed admission form tab as requested
   ];
 
   return (
@@ -59,8 +56,11 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
               <Menu size={24} />
             </button>
             <Link to="/" className="flex items-center">
-              <span className="font-bold text-xl mr-2">Chill</span>
-              <span className="text-primary font-bold">Campus</span>
+              <img 
+                src="/lovable-uploads/3c6dbbea-7d16-4baa-9fd3-29cdc89d1d02.png" 
+                alt="Chill Campus Logo" 
+                className="h-10 mr-2" 
+              />
             </Link>
           </div>
 

@@ -8,7 +8,6 @@ import Layout from "./components/layout/Layout";
 import Home from "./pages/Home";
 import Community from "./pages/Community";
 import Complaint from "./pages/Complaint";
-import Admission from "./pages/Admission";
 import NotFound from "./pages/NotFound";
 import Calendar from "./pages/Calendar";
 import Events from "./pages/Events";
@@ -20,8 +19,6 @@ import Finance from "./pages/Finance";
 import Faculty from "./pages/Faculty";
 import Library from "./pages/Library";
 import Tutoring from "./pages/Tutoring";
-import Hostels from "./pages/Hostels";
-import Dining from "./pages/Dining";
 import Planner from "./pages/Planner";
 import Pomodoro from "./pages/Pomodoro";
 import Mood from "./pages/Mood";
@@ -38,7 +35,6 @@ const App = () => (
           <Route path="/" element={<Layout><Home /></Layout>} />
           <Route path="/community" element={<Layout><Community /></Layout>} />
           <Route path="/complaint" element={<Layout><Complaint /></Layout>} />
-          <Route path="/admission" element={<Layout><Admission /></Layout>} />
           
           {/* Sidebar routes */}
           <Route path="/calendar" element={<Layout><Calendar /></Layout>} />
@@ -55,11 +51,11 @@ const App = () => (
           <Route path="/pomodoro" element={<Layout><Pomodoro /></Layout>} />
           <Route path="/mood" element={<Layout><Mood /></Layout>} />
           
-          {/* New routes */}
+          {/* Academic Resources */}
           <Route path="/library" element={<Layout><Library /></Layout>} />
           <Route path="/tutoring" element={<Layout><Tutoring /></Layout>} />
-          <Route path="/hostels" element={<Layout><Hostels /></Layout>} />
-          <Route path="/dining" element={<Layout><Dining /></Layout>} />
+          
+          {/* Removed hostels and dining routes as per request */}
           
           {/* Additional routes for 404 pages */}
           <Route path="/clubs" element={<Layout><NotFound /></Layout>} />
