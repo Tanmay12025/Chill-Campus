@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { DollarSign, CreditCard, FileText, ArrowRight, Calendar, Clock, FileCheck } from "lucide-react";
+import { DollarSign, CreditCard, FileText, ArrowRight, Calendar, Clock, FileCheck, Download, Eye } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -26,9 +27,9 @@ const sampleFinancialData = {
   totalDue: 7200,
   totalPaid: 3500,
   paymentHistory: [
-    { id: 1, date: "2024-01-15", amount: 2000, type: "Tuition Fee", status: "Paid" },
-    { id: 2, date: "2024-01-25", amount: 1200, status: "Paid", type: "Hostel Fee" },
-    { id: 3, date: "2024-02-10", amount: 300, status: "Paid", type: "Library Fee" },
+    { id: 1, date: "2024-01-15", amount: 2000, type: "Tuition Fee", status: "Paid", receiptNo: "REC-20240115-001" },
+    { id: 2, date: "2024-01-25", amount: 1200, status: "Paid", type: "Hostel Fee", receiptNo: "REC-20240125-002" },
+    { id: 3, date: "2024-02-10", amount: 300, status: "Paid", type: "Library Fee", receiptNo: "REC-20240210-003" },
   ],
   upcomingPayments: [
     { id: 1, dueDate: "2024-04-30", amount: 1500, type: "Tuition Fee (Installment)", status: "Pending" },
@@ -40,6 +41,9 @@ const sampleFinancialData = {
 const Finance = () => {
   const [currency, setCurrency] = useState("USD");
   const [currencyRate, setCurrencyRate] = useState(1);
+  const [receiptDialogOpen, setReceiptDialogOpen] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
+  
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -81,6 +85,17 @@ const Finance = () => {
   
   // Calculate payment progress
   const paymentProgress = (sampleFinancialData.totalPaid / sampleFinancialData.totalDue) * 100;
+
+  // View receipt handler
+  const handleViewReceipt = (payment: any) => {
+    setSelectedReceipt(payment);
+    setReceiptDialogOpen(true);
+  };
+
+  // Print receipt
+  const printReceipt = () => {
+    window.print();
+  };
 
   return (
     <div className="container py-8">
@@ -241,8 +256,13 @@ const Finance = () => {
                           </span>
                         </td>
                         <td className="py-3 px-2">
-                          <Button variant="ghost" size="sm" className="flex items-center h-8">
-                            <FileText className="h-4 w-4 mr-1" />
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="flex items-center h-8"
+                            onClick={() => handleViewReceipt(payment)}
+                          >
+                            <Eye className="h-4 w-4 mr-1" />
                             <span>View</span>
                           </Button>
                         </td>
@@ -298,6 +318,56 @@ const Finance = () => {
           </Card>
         </TabsContent>
       </Tabs>
+      
+      {/* Receipt Dialog */}
+      <Dialog open={receiptDialogOpen} onOpenChange={setReceiptDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Payment Receipt</DialogTitle>
+            <DialogDescription>
+              Receipt details for your payment
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedReceipt && (
+            <div className="space-y-4 p-4 border rounded-lg">
+              <div className="text-center mb-4">
+                <h3 className="text-xl font-bold">Payment Receipt</h3>
+                <p className="text-muted-foreground">VIT Bhopal University</p>
+              </div>
+              
+              <div className="border-t border-b py-4">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="text-muted-foreground">Receipt No:</div>
+                  <div className="font-medium">{selectedReceipt.receiptNo}</div>
+                  
+                  <div className="text-muted-foreground">Date:</div>
+                  <div className="font-medium">{new Date(selectedReceipt.date).toLocaleDateString()}</div>
+                  
+                  <div className="text-muted-foreground">Payment Type:</div>
+                  <div className="font-medium">{selectedReceipt.type}</div>
+                  
+                  <div className="text-muted-foreground">Amount:</div>
+                  <div className="font-medium">{formatAmount(selectedReceipt.amount)}</div>
+                  
+                  <div className="text-muted-foreground">Status:</div>
+                  <div className="font-medium text-green-600">{selectedReceipt.status}</div>
+                </div>
+              </div>
+              
+              <div className="flex space-x-2 justify-end mt-4">
+                <Button variant="outline" onClick={printReceipt}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+                <Button onClick={() => setReceiptDialogOpen(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   ArrowRight, 
@@ -19,16 +18,24 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 const Planner = () => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("schedule");
+  const [newTask, setNewTask] = useState({
+    title: "",
+    course: "",
+    dueDate: "",
+    priority: "medium"
+  });
   
-  const upcomingDeadlines = [
+  const [upcomingDeadlines, setUpcomingDeadlines] = useState([
     { id: 1, title: "Data Structures Assignment", course: "CSE201", date: "2025-04-18", progress: 60 },
     { id: 2, title: "Calculus Quiz", course: "MTH101", date: "2025-04-20", progress: 20 },
     { id: 3, title: "Research Paper Draft", course: "ENG205", date: "2025-04-25", progress: 40 },
     { id: 4, title: "Group Project Presentation", course: "MKT302", date: "2025-04-30", progress: 75 }
-  ];
+  ]);
   
   const studySlots = [
     { id: 1, time: "09:00 - 10:30", course: "Physics Lab", location: "Science Block", priority: "high" },
@@ -51,6 +58,50 @@ const Planner = () => {
     focusScore: 82
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setNewTask(prev => ({
+      ...prev,
+      [id.replace('task-', '')]: value
+    }));
+  };
+
+  const handleAddTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newTask.title || !newTask.course || !newTask.dueDate) {
+      toast({
+        title: "Missing information",
+        description: "Please fill all required fields",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const newTaskItem = {
+      id: Date.now(),
+      title: newTask.title,
+      course: newTask.course,
+      date: newTask.dueDate,
+      progress: 0
+    };
+    
+    setUpcomingDeadlines(prev => [...prev, newTaskItem]);
+    
+    // Reset form
+    setNewTask({
+      title: "",
+      course: "",
+      dueDate: "",
+      priority: "medium"
+    });
+    
+    toast({
+      title: "Task added",
+      description: "Your new task has been added successfully"
+    });
+  };
+
   return (
     <div className="space-y-6 py-4">
       <div className="flex items-center justify-between">
@@ -63,14 +114,14 @@ const Planner = () => {
             <Calendar className="mr-2 h-4 w-4" />
             Sync Calendar
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => setActiveTab("tasks")}>
             <ListTodo className="mr-2 h-4 w-4" />
             Add Task
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="schedule" onValueChange={setActiveTab} className="w-full">
+      <Tabs defaultValue="schedule" value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="tasks">Tasks & Deadlines</TabsTrigger>
@@ -211,22 +262,45 @@ const Planner = () => {
                   <CardTitle>Add New Task</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form className="space-y-4">
+                  <form className="space-y-4" onSubmit={handleAddTask}>
                     <div className="space-y-2">
                       <Label htmlFor="task-title">Title</Label>
-                      <Input id="task-title" placeholder="Task title" />
+                      <Input 
+                        id="task-title" 
+                        placeholder="Task title" 
+                        value={newTask.title}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="task-course">Course</Label>
-                      <Input id="task-course" placeholder="Course code" />
+                      <Input 
+                        id="task-course" 
+                        placeholder="Course code" 
+                        value={newTask.course}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="task-date">Due Date</Label>
-                      <Input id="task-date" type="date" />
+                      <Label htmlFor="task-dueDate">Due Date</Label>
+                      <Input 
+                        id="task-dueDate" 
+                        type="date" 
+                        value={newTask.dueDate}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="task-priority">Priority</Label>
-                      <select id="task-priority" className="w-full p-2 rounded-md border">
+                      <select 
+                        id="task-priority" 
+                        className="w-full p-2 rounded-md border"
+                        value={newTask.priority}
+                        onChange={handleInputChange}
+                      >
                         <option value="high">High</option>
                         <option value="medium">Medium</option>
                         <option value="low">Low</option>

@@ -1,10 +1,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import { X, Send, MessageSquare, Calendar, Book, FileText } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ChatbotProps {
   isOpen: boolean;
   onClose: () => void;
+  collegeName?: string;
 }
 
 interface Message {
@@ -21,17 +23,23 @@ interface QuickOption {
   action: () => void;
 }
 
-const Chatbot = ({ isOpen, onClose }: ChatbotProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "welcome",
-      text: "Hello! I am VIT Assistant. How can I help you today?",
-      sender: "bot",
-      timestamp: new Date(),
-    },
-  ]);
+const Chatbot = ({ isOpen, onClose, collegeName = "VIT" }: ChatbotProps) => {
+  const { profile } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Set initial welcome message with dynamic college name
+  useEffect(() => {
+    setMessages([
+      {
+        id: "welcome",
+        text: `Hello${profile?.first_name ? ` ${profile.first_name}` : ''}! I am ${collegeName} Assistant. How can I help you today?`,
+        sender: "bot",
+        timestamp: new Date(),
+      },
+    ]);
+  }, [collegeName, profile?.first_name]);
 
   const quickOptions: QuickOption[] = [
     {
@@ -97,17 +105,17 @@ const Chatbot = ({ isOpen, onClose }: ChatbotProps) => {
     let response = "";
 
     if (lowerInput.includes("deadline")) {
-      response = "Important deadlines:\n• April 20: Semester registration\n• April 21-28: Mid-semester exams\n• May 10: Fee payment\n• May 15: Course withdrawal";
+      response = `Important deadlines:\n• April 20: Semester registration\n• April 21-28: Mid-semester exams\n• May 10: Fee payment\n• May 15: Course withdrawal`;
     } else if (lowerInput.includes("complaint") || lowerInput.includes("file")) {
-      response = "To file a complaint, please visit the Complaint tab in the main navigation menu. You'll need to select a category and provide details. Your complaint will be assigned a tracking number.";
+      response = `To file a complaint, please visit the Complaint tab in the main navigation menu. You'll need to select a category and provide details. Your complaint will be assigned a tracking number.`;
     } else if (lowerInput.includes("resource") || lowerInput.includes("study")) {
-      response = "You can find study resources in:\n• University Learning Management System\n• Digital Library (accessible from Quick Links)\n• Department Resource Centers\n• Academic Resource Repository";
+      response = `You can find study resources in:\n• ${collegeName} Learning Management System\n• Digital Library (accessible from Quick Links)\n• Department Resource Centers\n• Academic Resource Repository`;
     } else if (lowerInput.includes("exam") || lowerInput.includes("test")) {
-      response = "Mid-semester exams are scheduled from April 21-28. The detailed schedule is available on the examination portal. For specific subject schedules, please check your student dashboard.";
+      response = `Mid-semester exams are scheduled from April 21-28. The detailed schedule is available on the examination portal. For specific subject schedules, please check your student dashboard.`;
     } else if (lowerInput.includes("holiday") || lowerInput.includes("vacation")) {
-      response = "Upcoming holidays:\n• April 14: Ambedkar Jayanti\n• May 1: Labor Day\n• May 15-16: University Foundation Day celebrations";
+      response = `Upcoming holidays:\n• April 14: Ambedkar Jayanti\n• May 1: Labor Day\n• May 15-16: ${collegeName} Foundation Day celebrations`;
     } else if (lowerInput.includes("hello") || lowerInput.includes("hi") || lowerInput.includes("hey")) {
-      response = "Hello! How can I assist you with VIT Bhopal University information today?";
+      response = `Hello${profile?.first_name ? ` ${profile.first_name}` : ''}! How can I assist you with ${collegeName} information today?`;
     } else {
       response = "I'm not sure I understand. Could you rephrase or select one of the quick options below?";
     }
@@ -123,7 +131,7 @@ const Chatbot = ({ isOpen, onClose }: ChatbotProps) => {
       <div className="bg-primary text-primary-foreground p-3 flex items-center justify-between">
         <div className="flex items-center">
           <MessageSquare className="h-5 w-5 mr-2" />
-          <h3 className="font-medium">VIT Assistant</h3>
+          <h3 className="font-medium">{collegeName} Assistant</h3>
         </div>
         <button
           onClick={onClose}

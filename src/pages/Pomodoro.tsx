@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Play, 
   Pause, 
@@ -20,8 +20,10 @@ import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/hooks/use-toast";
 
 const Pomodoro = () => {
+  const { toast } = useToast();
   const [timerMode, setTimerMode] = useState<"focus" | "shortBreak" | "longBreak">("focus");
   const [isRunning, setIsRunning] = useState(false);
   const [seconds, setSeconds] = useState(0);
@@ -31,6 +33,11 @@ const Pomodoro = () => {
     { id: 3, text: "Read chapter 5", done: false }
   ]);
   const [newTask, setNewTask] = useState("");
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [timerVolume, setTimerVolume] = useState(80);
+  
+  // Ref for audio element
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // Timer durations in seconds
   const timerDurations = {
@@ -50,7 +57,27 @@ const Pomodoro = () => {
   // Initialize timer
   useEffect(() => {
     setSeconds(timerDurations[timerMode]);
+    
+    // Create audio element for timer completion sound
+    if (!audioRef.current) {
+      const audio = new Audio("https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3");
+      audio.volume = timerVolume / 100;
+      audioRef.current = audio;
+    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
   }, [timerMode]);
+  
+  // Update audio volume when timerVolume changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = timerVolume / 100;
+    }
+  }, [timerVolume]);
   
   // Timer logic
   useEffect(() => {
@@ -62,6 +89,19 @@ const Pomodoro = () => {
       }, 1000);
     } else if (seconds === 0 && isRunning) {
       setIsRunning(false);
+      
+      // Play sound when timer ends if enabled
+      if (soundEnabled && audioRef.current) {
+        audioRef.current.play().catch(err => console.error("Error playing sound:", err));
+        
+        // Show notification
+        toast({
+          title: `${timerMode === "focus" ? "Focus" : "Break"} session completed!`,
+          description: timerMode === "focus" 
+            ? "Time for a well-deserved break." 
+            : "Ready to get back to work?",
+        });
+      }
       
       // Update stats
       if (timerMode === "focus") {
@@ -98,7 +138,7 @@ const Pomodoro = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isRunning, seconds, timerMode]);
+  }, [isRunning, seconds, timerMode, soundEnabled]);
   
   // Format time as MM:SS
   const formatTime = (totalSeconds: number) => {
@@ -128,6 +168,11 @@ const Pomodoro = () => {
     if (newTask.trim() !== "") {
       setTasks([...tasks, { id: Date.now(), text: newTask, done: false }]);
       setNewTask("");
+      
+      toast({
+        title: "Task added",
+        description: "New task has been added to your session"
+      });
     }
   };
   
@@ -136,6 +181,15 @@ const Pomodoro = () => {
     setTasks(tasks.map(task => 
       task.id === id ? { ...task, done: !task.done } : task
     ));
+    
+    // Show toast when task is completed
+    const task = tasks.find(t => t.id === id);
+    if (task && !task.done) {
+      toast({
+        title: "Task completed",
+        description: `"${task.text}" marked as done`
+      });
+    }
   };
 
   return (
@@ -271,7 +325,7 @@ const Pomodoro = () => {
                       key={task.id} 
                       className={`flex items-center p-2 rounded hover:bg-muted ${
                         task.done ? 'text-muted-foreground' : ''
-                      }`}
+                      } cursor-pointer`}
                       onClick={() => toggleTask(task.id)}
                     >
                       <div className={`p-1 rounded-full border mr-2 ${
@@ -311,7 +365,10 @@ const Pomodoro = () => {
                     Play sound when timer ends
                   </div>
                 </div>
-                <Switch checked />
+                <Switch 
+                  checked={soundEnabled} 
+                  onCheckedChange={setSoundEnabled} 
+                />
               </div>
               
               <Separator />
@@ -321,7 +378,14 @@ const Pomodoro = () => {
                   <Volume2 className="h-4 w-4" />
                   <Label>Timer Volume</Label>
                 </div>
-                <input type="range" className="w-24" defaultValue={80} />
+                <input 
+                  type="range" 
+                  className="w-24" 
+                  min="0"
+                  max="100"
+                  value={timerVolume}
+                  onChange={(e) => setTimerVolume(Number(e.target.value))}
+                />
               </div>
               
               <div className="flex items-center justify-between">
