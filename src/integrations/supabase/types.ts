@@ -9,13 +9,222 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      community_participants: {
+        Row: {
+          community_id: string | null
+          id: string
+          joined_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          community_id?: string | null
+          id?: string
+          joined_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          community_id?: string | null
+          id?: string
+          joined_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_participants_community_id_fkey"
+            columns: ["community_id"]
+            isOneToOne: false
+            referencedRelation: "community_services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_services: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string
+          end_date: string | null
+          id: string
+          image_url: string | null
+          location: string | null
+          max_participants: number | null
+          organizer: string | null
+          start_date: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description: string
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          max_participants?: number | null
+          organizer?: string | null
+          start_date?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          max_participants?: number | null
+          organizer?: string | null
+          start_date?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      exams: {
+        Row: {
+          course_id: string | null
+          created_at: string | null
+          created_by: string | null
+          date: string
+          duration: number
+          id: string
+          location: string | null
+          max_marks: number
+          title: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          date: string
+          duration: number
+          id?: string
+          location?: string | null
+          max_marks: number
+          title: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          date?: string
+          duration?: number
+          id?: string
+          location?: string | null
+          max_marks?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exams_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "faculty_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faculty_courses: {
+        Row: {
+          course_code: string
+          course_name: string
+          created_at: string | null
+          faculty_id: string | null
+          id: string
+          semester: string | null
+        }
+        Insert: {
+          course_code: string
+          course_name: string
+          created_at?: string | null
+          faculty_id?: string | null
+          id?: string
+          semester?: string | null
+        }
+        Update: {
+          course_code?: string
+          course_name?: string
+          created_at?: string | null
+          faculty_id?: string | null
+          id?: string
+          semester?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faculty_courses_faculty_id_fkey"
+            columns: ["faculty_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          college_id: string | null
+          department: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          semester: string | null
+          updated_at: string | null
+          user_type: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          college_id?: string | null
+          department?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone?: string | null
+          semester?: string | null
+          updated_at?: string | null
+          user_type: string
+        }
+        Update: {
+          avatar_url?: string | null
+          college_id?: string | null
+          department?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          semester?: string | null
+          updated_at?: string | null
+          user_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_profile: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string | null
+          college_id: string | null
+          department: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          semester: string | null
+          updated_at: string | null
+          user_type: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

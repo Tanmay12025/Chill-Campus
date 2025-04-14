@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   User, 
   Bell, 
@@ -7,12 +8,145 @@ import {
   Moon, 
   Sun,
   Save,
-  Undo
+  Undo,
+  Loader2
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("profile");
+  const { user, profile, updateProfile } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
   
+  const [formData, setFormData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    college_id: "",
+    department: "",
+    semester: "",
+  });
+
+  const [currency, setCurrency] = useState("USD");
+  const [currencyRate, setCurrencyRate] = useState(1);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        email: user.email || "",
+        phone: profile.phone || "",
+        college_id: profile.college_id || "",
+        department: profile.department || "",
+        semester: profile.semester || "",
+      });
+    }
+
+    const storedCurrency = localStorage.getItem("preferredCurrency") || "USD";
+    setCurrency(storedCurrency);
+    
+    if (storedCurrency === "INR") {
+      setCurrencyRate(83.34);
+      toast({
+        title: "Currency updated",
+        description: "Financial amounts will be displayed in Indian Rupees (₹)",
+      });
+    } else {
+      setCurrencyRate(1);
+      toast({
+        title: "Currency updated",
+        description: "Financial amounts will be displayed in US Dollars ($)",
+      });
+    }
+  }, [user, profile, navigate]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleCurrencyChange = (value: string) => {
+    setCurrency(value);
+    localStorage.setItem("preferredCurrency", value);
+    
+    if (value === "INR") {
+      setCurrencyRate(83.34);
+      toast({
+        title: "Currency updated",
+        description: "Financial amounts will be displayed in Indian Rupees (₹)",
+      });
+    } else {
+      setCurrencyRate(1);
+      toast({
+        title: "Currency updated",
+        description: "Financial amounts will be displayed in US Dollars ($)",
+      });
+    }
+  };
+
+  const handleProfileUpdate = async () => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    
+    try {
+      const { error } = await updateProfile({
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        phone: formData.phone,
+        college_id: formData.college_id,
+        department: formData.department,
+        semester: formData.semester,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully",
+      });
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Update failed",
+        description: error.message || "Failed to update profile",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleResetForm = () => {
+    if (profile) {
+      setFormData({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        email: user?.email || "",
+        phone: profile.phone || "",
+        college_id: profile.college_id || "",
+        department: profile.department || "",
+        semester: profile.semester || "",
+      });
+    }
+  };
+
   return (
     <div className="space-y-6 py-4">
       <div className="flex items-center justify-between">
@@ -75,20 +209,40 @@ const Settings = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">First Name</label>
-                          <input type="text" className="w-full p-2 border rounded-md" defaultValue="John" />
+                          <Input 
+                            type="text" 
+                            name="first_name"
+                            value={formData.first_name} 
+                            onChange={handleInputChange}
+                          />
                         </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Last Name</label>
-                          <input type="text" className="w-full p-2 border rounded-md" defaultValue="Doe" />
+                          <Input 
+                            type="text" 
+                            name="last_name"
+                            value={formData.last_name} 
+                            onChange={handleInputChange}
+                          />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Email Address</label>
-                        <input type="email" className="w-full p-2 border rounded-md" defaultValue="john.doe@example.com" />
+                        <Input 
+                          type="email" 
+                          name="email"
+                          value={formData.email} 
+                          disabled
+                        />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Phone Number</label>
-                        <input type="tel" className="w-full p-2 border rounded-md" defaultValue="(123) 456-7890" />
+                        <Input 
+                          type="tel" 
+                          name="phone"
+                          value={formData.phone} 
+                          onChange={handleInputChange}
+                        />
                       </div>
                     </div>
                   </div>
@@ -97,33 +251,70 @@ const Settings = () => {
                     <h3 className="text-lg font-medium mb-4">Academic Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Student ID</label>
-                        <input type="text" className="w-full p-2 border rounded-md bg-muted" defaultValue="S12345678" readOnly />
+                        <label className="text-sm font-medium">College ID</label>
+                        <Input 
+                          type="text" 
+                          name="college_id"
+                          value={formData.college_id} 
+                          onChange={handleInputChange}
+                        />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Program</label>
-                        <input type="text" className="w-full p-2 border rounded-md bg-muted" defaultValue="Computer Science" readOnly />
+                        <label className="text-sm font-medium">Department</label>
+                        <Input 
+                          type="text" 
+                          name="department"
+                          value={formData.department} 
+                          onChange={handleInputChange}
+                        />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Batch</label>
-                        <input type="text" className="w-full p-2 border rounded-md bg-muted" defaultValue="2022-2026" readOnly />
+                        <label className="text-sm font-medium">Semester</label>
+                        <Input 
+                          type="text" 
+                          name="semester"
+                          value={formData.semester} 
+                          onChange={handleInputChange}
+                        />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Current Semester</label>
-                        <input type="text" className="w-full p-2 border rounded-md bg-muted" defaultValue="4" readOnly />
+                        <label className="text-sm font-medium">User Type</label>
+                        <Input 
+                          type="text" 
+                          value={profile?.user_type || ''} 
+                          className="bg-muted"
+                          disabled
+                        />
                       </div>
                     </div>
                   </div>
                   
                   <div className="flex justify-end space-x-3">
-                    <button className="flex items-center px-4 py-2 border rounded-md hover:bg-muted">
+                    <Button 
+                      variant="outline"
+                      className="flex items-center" 
+                      onClick={handleResetForm}
+                    >
                       <Undo size={18} className="mr-2" />
                       <span>Cancel</span>
-                    </button>
-                    <button className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md">
-                      <Save size={18} className="mr-2" />
-                      <span>Save Changes</span>
-                    </button>
+                    </Button>
+                    <Button 
+                      className="flex items-center"
+                      onClick={handleProfileUpdate}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? (
+                        <>
+                          <Loader2 size={18} className="mr-2 animate-spin" />
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save size={18} className="mr-2" />
+                          <span>Save Changes</span>
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -186,20 +377,20 @@ const Settings = () => {
                     <div className="grid grid-cols-1 gap-4">
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Current Password</label>
-                        <input type="password" className="w-full p-2 border rounded-md" />
+                        <Input type="password" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">New Password</label>
-                        <input type="password" className="w-full p-2 border rounded-md" />
+                        <Input type="password" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Confirm New Password</label>
-                        <input type="password" className="w-full p-2 border rounded-md" />
+                        <Input type="password" />
                       </div>
                     </div>
-                    <button className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-md">
+                    <Button className="mt-2">
                       Update Password
-                    </button>
+                    </Button>
                   </div>
                   
                   <div className="pt-6 border-t">
@@ -221,9 +412,9 @@ const Settings = () => {
                           <h3 className="font-medium">Two-Factor Authentication</h3>
                           <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
                         </div>
-                        <button className="px-3 py-1.5 border rounded-md hover:bg-muted">
+                        <Button variant="outline">
                           Enable
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -259,6 +450,32 @@ const Settings = () => {
                           <p className="text-sm text-muted-foreground">Follow system appearance</p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h3 className="text-lg font-medium mb-4">Currency</h3>
+                    <div className="space-y-2">
+                      <Select
+                        value={currency}
+                        onValueChange={handleCurrencyChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">US Dollar ($)</SelectItem>
+                          <SelectItem value="INR">Indian Rupee (₹)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Selected currency will be used across the app for financial information
+                      </p>
+                      {currency === "INR" && (
+                        <div className="mt-2 p-2 bg-muted rounded-md text-sm">
+                          Current exchange rate: 1 USD = {currencyRate} INR
+                        </div>
+                      )}
                     </div>
                   </div>
                   
